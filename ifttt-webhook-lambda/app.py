@@ -2,8 +2,11 @@ import json
 import boto3
 import os
 
+# reading SECRET from an environment variable
 SECRET = os.environ['SECRET']
 
+# ---------------------------------------------------------------
+# Validates if the secret in the request is matching the expected secret
 def validate_secret(event,secret):
     # getting the value of SECRET from the request URL
     secret_from_request = None
@@ -19,6 +22,8 @@ def validate_secret(event,secret):
     else:
         return True
 
+# ---------------------------------------------------------------
+# Extracts data passed by IFTTT into an object
 def get_body_from_event(event):
     body = None
     if 'body' in event:
@@ -34,19 +39,20 @@ def get_body_from_event(event):
 
     return body
 
+# ---------------------------------------------------------------
+# The main Lambda handler function
 def lambda_handler(event, context):
     # validating if SECRET is present in the request and valid
     if not validate_secret(event,SECRET):
-        raise Exception('Secret invalid or missing')
+        raise Exception('Secret is missing or invalid')
 
-    # getting body from the event
+    # getting body from the event and raising an exception if it's missing
     body = get_body_from_event(event)
-
     if body == None:
         raise Exception('Body is missing or malformed')
 
     # ---------------------- #
-    # Here goes your code    #
+    # Your code goes here    #
     # ---------------------- #
     print('body=')
     print('{}',json.dumps(body))
