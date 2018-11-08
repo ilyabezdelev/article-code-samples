@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample serverless app to integrate with IFTTT webhooks
+
+Globals:
+    Function:
+        Timeout: 3
+
+Parameters:
+    Secret:
+        Description: A key to verify that the caller is IFTTT
+        Type: String
+
+Resources:
+    WebhookFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: app.py
+            Handler: app.lambda_handler
+            Runtime: python3.6
+            Environment:
+                Variables:
+                    SECRET: !Ref Secret
+            Events:
+                IFTTTWebhookEndpoint:
+                    Type: Api
+                    Properties:
+                        Path: /ifttt-webhook
+                        Method: post
+
+Outputs:
+    WebhookAPI:
+        Description: "API Gateway endpoint URL for Prod stage for WebhookFunction"
+        Value: !Join
+        - ''
+        - - !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ifttt-webhook"
+          - '?SECRET='
+          - !Ref Secret
+
+    WebhookFunction:
+        Description: "Function ARN"
+        Value: !GetAtt WebhookFunction.Arn
+
+    WebhookFunctionIamRole:
+      Description: "Implicit IAM Role created for WebhookFunction"
+      Value: !GetAtt WebhookFunctionRole.Arn
