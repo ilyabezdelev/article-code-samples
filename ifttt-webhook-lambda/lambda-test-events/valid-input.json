@@ -1,0 +1,6 @@
+{
+    "queryStringParameters": {
+        "SECRET": "value"
+    },
+    "body": "{\"key\": \"value\"}"
+}
